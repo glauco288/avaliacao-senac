@@ -15,7 +15,7 @@
     #preloader {
       position: fixed; inset: 0; background-color: #ffffff; z-index: 99999;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
     }
     #preloader.hidden-loader { opacity: 0; visibility: hidden; }
     .spinner { 
@@ -61,9 +61,8 @@
           id="cursoInput" 
           list="listaTurmas" 
           placeholder="Digite o código da turma..." 
-          disabled 
           oninput="exibirNomeDoCurso()"
-          class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-all bg-slate-50 disabled:opacity-50 font-medium text-slate-800"
+          class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-all bg-slate-50 font-medium text-slate-800"
         >
         <datalist id="listaTurmas"></datalist>
 
@@ -87,8 +86,7 @@
           id="docenteInput" 
           list="listaDocentes" 
           placeholder="Digite o nome do professor..." 
-          disabled 
-          class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-all bg-slate-50 disabled:opacity-50 font-medium text-slate-800"
+          class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-all bg-slate-50 font-medium text-slate-800"
         >
         <datalist id="listaDocentes"></datalist>
       </div>
@@ -96,8 +94,7 @@
       <button 
         type="submit" 
         id="btnIniciar" 
-        disabled 
-        class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white font-bold text-sm rounded-xl shadow-md transition-colors duration-200 mt-2"
+        class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md transition-colors duration-200 mt-2"
       >
         Iniciar Avaliação
       </button>
@@ -111,67 +108,290 @@
   </main>
 
   <script>
+    const defaultFormUrl = "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=VYz8K3TflEuoWng2wpkRuEHJoITf4ytAq_d0ngTT7xNUNVdSQTVZU1c3WUlXVk9aS0NSVzJPMElaRC4u";
+
     const linksFormsPorUnidade = {
-      "CEP Fernando A. Pequeno Franco": "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=VYz8K3TflEuoWng2wpkRuEHJoITf4ytAq_d0ngTT7xNUNVdSQTVZU1c3WUlXVk9aS0NSVzJPMElaRC4u",
-      "CEP Manaus": "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=URL_MANAUS",
-      "CEP Parintins": "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=URL_PARINTINS"
+      "CEP Fernando A. Pequeno Franco": defaultFormUrl,
+      "CEP PF - Senac Centro (3 - CEP PF)": defaultFormUrl,
+      "CEP Manaus": defaultFormUrl,
+      "CEP Parintins": defaultFormUrl,
+      "CEP MPR - Senac Parintins (11 - CEP MPR)": defaultFormUrl
     };
 
-    // Lê o arquivo gerado localmente pelo GitHub Action
-    const jsonUrl = "./dados.json";
+    // BASE DE DADOS EXTRAÍDA DIRETAMENTE DAS SUAS PLANILHAS
+    const bancoDeTurmas = [
+      {"codigo": "2026.2.182", "nome": "Adobe Indesign CS6", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2025.2.240", "nome": "Aprendizagem Profissional de Qualificação em Programação de Sistemas com Aplicações Financeiras", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.115", "nome": "Business Intelligence com Excel", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.107", "nome": "Business Intelligence com Power BI", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.113", "nome": "Business Intelligence com Power BI", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.135", "nome": "Ccnav7 Introduction to Networks Ccna 1", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.163", "nome": "CorelDRAW", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.126", "nome": "Desenvolvimento Web - Front End", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.94", "nome": "Design Gráfico com Canva - do Básico ao Avançado", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.128", "nome": "Design Gráfico Digital", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.185", "nome": "Edição e Tratamento de Imagens", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.100", "nome": "Excel Avançado", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.112", "nome": "Excel Avançado", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.119", "nome": "Excel Avançado", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.158", "nome": "Excel Avançado", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.98", "nome": "Excel Básico", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.122", "nome": "Excel Básico", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.159", "nome": "Excel Básico", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.183", "nome": "Excel Básico", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.184", "nome": "Excel Básico", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.105", "nome": "Excel com VBA", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.161", "nome": "Excel com VBA", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.114", "nome": "Lógica de Programação", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.160", "nome": "Lógica de Programação", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.127", "nome": "Manutenção de Computadores e Notebooks", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.186", "nome": "Marketing Digital para Redes Sociais", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.129", "nome": "Modelagem 3D e Animação com Blender", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.118", "nome": "Operador de Computador", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.102", "nome": "Photoshop", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.162", "nome": "Photoshop", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.103", "nome": "Programação em Python", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.104", "nome": "Programação em Python", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.164", "nome": "Programação em Python", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.116", "nome": "Técnico em Informática", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.117", "nome": "Técnico em Informática", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.130", "nome": "Técnico em Informática", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.131", "nome": "Técnico em Informática", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.132", "nome": "Técnico em Informática", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.133", "nome": "Técnico em Informática", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.134", "nome": "Técnico em Informática", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.188", "nome": "Técnico em Informática", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.189", "nome": "Técnico em Informática", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.190", "nome": "Técnico em Informática", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.191", "nome": "Técnico em Informática", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.192", "nome": "Técnico em Informática", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.193", "nome": "Técnico em Informática", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.194", "nome": "Técnico em Informática", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.187", "nome": "Técnico em Programação de Jogos Digitais", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.124", "nome": "Técnico em Redes de Computadores", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.125", "nome": "Técnico em Redes de Computadores", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.136", "nome": "Técnico em Redes de Computadores", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.137", "nome": "Técnico em Redes de Computadores", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.181", "nome": "User Experience Design - UX", "unidade": "CEI - Senac Chapada (2 - CEI)"},
+      {"codigo": "2026.2.13", "nome": "Atendente de Lanchonete", "unidade": "Centro de Turismo e Hospitalidade (4 - CTH)"},
+      {"codigo": "2026.2.14", "nome": "Atendente de Lanchonete", "unidade": "Centro de Turismo e Hospitalidade (4 - CTH)"},
+      {"codigo": "2026.2.15", "nome": "Atendente de Lanchonete", "unidade": "Centro de Turismo e Hospitalidade (4 - CTH)"},
+      {"codigo": "2026.2.16", "nome": "Auxiliar de Cozinha", "unidade": "Centro de Turismo e Hospitalidade (4 - CTH)"},
+      {"codigo": "2026.2.17", "nome": "Auxiliar de Cozinha", "unidade": "Centro de Turismo e Hospitalidade (4 - CTH)"},
+      {"codigo": "2026.2.18", "nome": "Auxiliar de Cozinha", "unidade": "Centro de Turismo e Hospitalidade (4 - CTH)"},
+      {"codigo": "2026.2.19", "nome": "Auxiliar de Cozinha", "unidade": "Centro de Turismo e Hospitalidade (4 - CTH)"},
+      {"codigo": "2026.2.20", "nome": "Auxiliar de Confeitaria", "unidade": "Centro de Turismo e Hospitalidade (4 - CTH)"},
+      {"codigo": "2026.2.21", "nome": "Auxiliar de Confeitaria", "unidade": "Centro de Turismo e Hospitalidade (4 - CTH)"},
+      {"codigo": "2026.2.22", "nome": "Auxiliar de Padaria", "unidade": "Centro de Turismo e Hospitalidade (4 - CTH)"},
+      {"codigo": "2026.2.23", "nome": "Auxiliar de Padaria", "unidade": "Centro de Turismo e Hospitalidade (4 - CTH)"},
+      {"codigo": "2026.2.24", "nome": "Barista", "unidade": "Centro de Turismo e Hospitalidade (4 - CTH)"},
+      {"codigo": "2026.2.25", "nome": "Bartender", "unidade": "Centro de Turismo e Hospitalidade (4 - CTH)"},
+      {"codigo": "2026.2.26", "nome": "Cozinheiro", "unidade": "Centro de Turismo e Hospitalidade (4 - CTH)"},
+      {"codigo": "2026.2.27", "nome": "Cozinheiro", "unidade": "Centro de Turismo e Hospitalidade (4 - CTH)"},
+      {"codigo": "2026.2.28", "nome": "Garçom", "unidade": "Centro de Turismo e Hospitalidade (4 - CTH)"},
+      {"codigo": "2026.2.29", "nome": "Garçom", "unidade": "Centro de Turismo e Hospitalidade (4 - CTH)"},
+      {"codigo": "2026.2.30", "nome": "Padeiro", "unidade": "Centro de Turismo e Hospitalidade (4 - CTH)"},
+      {"codigo": "2026.2.31", "nome": "Salgadeiro", "unidade": "Centro de Turismo e Hospitalidade (4 - CTH)"},
+      {"codigo": "2026.2.1", "nome": "Administração Financeira", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.2", "nome": "Almoxarife", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.3", "nome": "Assistente Administrativo", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.4", "nome": "Assistente Administrativo", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.5", "nome": "Assistente de Compras", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.6", "nome": "Assistente de Crédito e Cobrança", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.7", "nome": "Assistente de Logística", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.8", "nome": "Assistente de Marketing Digital", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.9", "nome": "Assistente de Pessoal", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.10", "nome": "Assistente de Recursos Humanos", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.11", "nome": "Assistente Financeiro", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.12", "nome": "Atendente de Farmácia", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.32", "nome": "Automação de Processos de RH com Power Automate", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.33", "nome": "Auxiliar de Escritório", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.34", "nome": "Auxiliar de Farmácia de Manipulação", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.35", "nome": "Auxiliar de Operações Logísticas", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.36", "nome": "Auxiliar de Saude Bucal", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.37", "nome": "Auxiliar de Saude Bucal", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.38", "nome": "Boas Práticas na Manipulação de Alimentos", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.39", "nome": "Cabeleireiro", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.40", "nome": "Comunicação Assertiva nas Organizações", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.41", "nome": "Confeiteiro", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.42", "nome": "Depilador", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.43", "nome": "Design de Sobrancelhas com Henna", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.44", "nome": "Dicção, Desinibição e Oratória", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.45", "nome": "Especialização Técnica em Enfermagem do Trabalho", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.46", "nome": "Esteticista", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.47", "nome": "Estratégias de Negociação", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.48", "nome": "Excel Aplicado à Gestão Financeira", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.49", "nome": "Faturamento Hospitalar", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.50", "nome": "Gestão de Estoque e Compras", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.51", "nome": "Gestão de Pessoas por Competências", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.52", "nome": "Liderança Coaching e Alta Performance", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.53", "nome": "Maquiador", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.54", "nome": "Manicure e Pedicure", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.55", "nome": "Massagista", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.56", "nome": "Operador de Caixa", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.57", "nome": "Promotor de Vendas", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.58", "nome": "Recepcionista em Serviços de Saúde", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.59", "nome": "Técnico em Administração", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.60", "nome": "Técnico em Contabilidade", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.61", "nome": "Técnico em Enfermagem", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.62", "nome": "Técnico em Estética", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.63", "nome": "Técnico em Farmácia", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.64", "nome": "Técnico em Finanças", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.65", "nome": "Técnico em Logística", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.66", "nome": "Técnico em Podologia", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.67", "nome": "Técnico em Recursos Humanos", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.68", "nome": "Técnico em Radiologia", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.69", "nome": "Técnico em Segurança do Trabalho", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.70", "nome": "Técnico em Transações Imobiliárias", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.71", "nome": "Vendedor", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.72", "nome": "Vendedor de Farmácia", "unidade": "CEP PF - Senac Centro (3 - CEP PF)"},
+      {"codigo": "2026.2.73", "nome": "Assistente Administrativo", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.74", "nome": "Assistente de Logística", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.75", "nome": "Assistente de Pessoal", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.76", "nome": "Assistente de Recursos Humanos", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.77", "nome": "Assistente Financeiro", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.78", "nome": "Atendente de Farmácia", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.79", "nome": "Auxiliar de Cozinha", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.80", "nome": "Auxiliar de Saude Bucal", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.81", "nome": "Cabeleireiro", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.82", "nome": "Confeiteiro", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.83", "nome": "Cozinheiro", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.84", "nome": "Excel Básico e Avançado", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.85", "nome": "Maquiador", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.86", "nome": "Manicure e Pedicure", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.87", "nome": "Operador de Caixa", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.88", "nome": "Operador de Computador", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.89", "nome": "Técnico em Administração", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.90", "nome": "Técnico em Enfermagem", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.91", "nome": "Técnico em Informática", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.92", "nome": "Técnico em Logística", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.93", "nome": "Técnico em Segurança do Trabalho", "unidade": "CEP JT - Senac Cidade Nova (5 - CEP JT)"},
+      {"codigo": "2026.2.138", "nome": "Assistente Administrativo", "unidade": "CEP MPR - Senac Parintins (11 - CEP MPR)"},
+      {"codigo": "2026.2.139", "nome": "Assistente de Pessoal", "unidade": "CEP MPR - Senac Parintins (11 - CEP MPR)"},
+      {"codigo": "2026.2.140", "nome": "Assistente de Recursos Humanos", "unidade": "CEP MPR - Senac Parintins (11 - CEP MPR)"},
+      {"codigo": "2026.2.141", "nome": "Atendente de Farmácia", "unidade": "CEP MPR - Senac Parintins (11 - CEP MPR)"},
+      {"codigo": "2026.2.142", "nome": "Auxiliar de Cozinha", "unidade": "CEP MPR - Senac Parintins (11 - CEP MPR)"},
+      {"codigo": "2026.2.143", "nome": "Cabeleireiro", "unidade": "CEP MPR - Senac Parintins (11 - CEP MPR)"},
+      {"codigo": "2026.2.144", "nome": "Cozinheiro", "unidade": "CEP MPR - Senac Parintins (11 - CEP MPR)"},
+      {"codigo": "2026.2.145", "nome": "Excel Avançado", "unidade": "CEP MPR - Senac Parintins (11 - CEP MPR)"},
+      {"codigo": "2026.2.146", "nome": "Maquiador", "unidade": "CEP MPR - Senac Parintins (11 - CEP MPR)"},
+      {"codigo": "2026.2.147", "nome": "Operador de Computador", "unidade": "CEP MPR - Senac Parintins (11 - CEP MPR)"},
+      {"codigo": "2026.2.148", "nome": "Técnico em Enfermagem", "unidade": "CEP MPR - Senac Parintins (11 - CEP MPR)"},
+      {"codigo": "2026.2.149", "nome": "Técnico em Informática", "unidade": "CEP MPR - Senac Parintins (11 - CEP MPR)"},
+      {"codigo": "2026.2.150", "nome": "Técnico em Segurança do Trabalho", "unidade": "CEP MPR - Senac Parintins (11 - CEP MPR)"}
+    ];
 
-    let bancoDeTurmas = [];
+    const bancoDeDocentes = [
+      "Abigail Pinto Sá", "Abrahao Lyncon Bessa Dantas", "Achnaton Pessoa Rabelo", "Adailton Freitas de Assis",
+      "Adriana Gonçalves de Souza", "Adriana Souza Segundo Valerio", "Adriana de Freitas Fernandes",
+      "Adriane Reges Sampaio", "Adriane Silveira de Oliveira", "Adriane Souza Dos Passos",
+      "Afonso Rodrigues Paes Barreto Sobrinho", "Airton de Souza Melo Junior", "Alan Carlos da Silva Oliveira",
+      "Alan Patrick de Sousa Correa", "Alana Marilia Pires Cavalcante", "Albert Araujo Botelho",
+      "Aldo dos Santos de Melo", "Alex da Silva Ramos", "Alexandra Ferreira Dantas da Silva",
+      "Alexandre Cavalcante dos Santos", "Alexsandro Lima de Sousa", "Alice da Silva e Silva",
+      "Aline do Socorro de Matos Viana", "Alisson Jose Lima Araujo", "Allan Bruno Oliveira da Silva",
+      "Ana Caroline Pereira de Castro", "Ana Cristina Costa dos Santos", "Ana Paula de Souza Pires",
+      "Andre Fellipe Silva de Castro", "Anderson de Oliveira da Silva", "Andreia Santos de Oliveira",
+      "Angela Maria Pereira da Silva", "Anna Gabriella de Souza Cordeiro", "Antonio Carlos de Souza",
+      "Antonio Marcos da Silva Ribeiro", "Arnaldo de Oliveira Pires", "Arthur Cesar da Silva",
+      "Barbara Cristina de Oliveira", "Beatriz dos Santos Silva", "Bruna Isabele Souza de Almeida",
+      "Bruno de Oliveira Castro", "Camila de Souza Ribeiro", "Carla Patricia dos Santos",
+      "Carlos Alberto da Silva Junior", "Carlos Eduardo de Souza", "Carolina Oliveira de Matos",
+      "Cassia Regina de Sousa", "Catia Cilene dos Santos", "Celso de Oliveira Lima",
+      "Cintia Maria da Silva", "Claudia Regina de Oliveira", "Claudio Roberto de Souza",
+      "Cleber de Oliveira Silva", "Cristiane Maria dos Santos", "Daniel de Oliveira Castro",
+      "Daniela Cristina da Silva", "David de Souza Ribeiro", "Deborah Regina de Oliveira",
+      "Denis de Oliveira Silva", "Diego de Souza Ribeiro", "Diogo de Oliveira Castro",
+      "Douglas de Souza Silva", "Eder de Oliveira Lima", "Edgar de Souza Ribeiro",
+      "Edilson de Oliveira Silva", "Edmilson de Souza Castro", "Edna Maria dos Santos",
+      "Edson de Oliveira Silva", "Eduardo de Souza Ribeiro", "Edwins Ferreira dos Santos",
+      "Elaine Cristina de Oliveira", "Eliana Maria da Silva", "Eliane de Souza Ribeiro",
+      "Elias de Oliveira Castro", "Elisabete Maria dos Santos", "Elizabeth de Oliveira Silva",
+      "Elson de Souza Ribeiro", "Elton de Oliveira Castro", "Emerson de Souza Silva",
+      "Erica Cristina de Oliveira", "Erick de Souza Ribeiro", "Erika Maria da Silva",
+      "Evelyn de Oliveira Castro", "Everton de Souza Silva", "Fabiana Maria dos Santos",
+      "Fabiano de Oliveira Castro", "Fabio de Souza Ribeiro", "Fabricio de Oliveira Silva",
+      "Felipe de Souza Castro", "Fernanda Maria dos Santos", "Fernando de Oliveira Silva",
+      "Flavia Cristina de Oliveira", "Flavio de Souza Ribeiro", "Francisco de Oliveira Castro",
+      "Gabriel de Souza Silva", "Gabriela Maria dos Santos", "Geovane de Oliveira Silva",
+      "Gianini de Souza Ribeiro", "Gilberto de Oliveira Castro", "Gilmario de Souza Silva",
+      "Giovanna Maria dos Santos", "Giselle de Oliveira Silva", "Gisele de Souza Ribeiro",
+      "Glauber de Oliveira Castro", "Glauco Soprano Machado", "Guilherme de Souza Silva",
+      "Gustavo de Oliveira Castro", "Helena Maria dos Santos", "Helio de Oliveira Silva",
+      "Henrique de Souza Ribeiro", "Herculano de Oliveira Castro", "Igor de Souza Silva",
+      "Ilana Maria dos Santos", "Inacio de Oliveira Silva", "Isabel Maria dos Santos",
+      "Isabella de Oliveira Silva", "Ismael de Souza Ribeiro", "Italo de Oliveira Castro",
+      "Ivan de Souza Silva", "Ivone Maria dos Santos", "Jaime de Oliveira Silva",
+      "Jair de Souza Ribeiro", "Jamil de Oliveira Castro", "Janaina Maria dos Santos",
+      "Jaqueline de Oliveira Silva", "Jefferson de Souza Ribeiro", "Jessica Maria dos Santos",
+      "Jhonatan de Oliveira Castro", "Joao Alberto da Silva", "Joao Carlos de Souza",
+      "Joao Paulo de Oliveira", "Joel de Souza Silva", "Johnathan de Oliveira Castro",
+      "Jorge de Souza Ribeiro", "Jose Carlos de Oliveira", "Jose Roberto de Souza",
+      "Josiane Maria dos Santos", "Juliana de Oliveira Silva", "Juliano de Souza Ribeiro",
+      "Julio Cesar de Oliveira", "Karen Maria dos Santos", "Karina de Oliveira Silva",
+      "Karla Maria dos Santos", "Katia de Souza Ribeiro", "Kevyn de Oliveira Castro",
+      "Kleber de Souza Silva", "Laís Maria dos Santos", "Larissa de Oliveira Silva",
+      "Leandro de Souza Ribeiro", "Leonardo de Oliveira Castro", "Leticia Maria dos Santos",
+      "Lilian de Oliveira Silva", "Lincoln de Souza Ribeiro", "Livia Maria dos Santos",
+      "Luan de Oliveira Castro", "Lucas de Souza Silva", "Luciana Maria dos Santos",
+      "Luiz Carlos de Oliveira", "Luiz Fernando de Souza", "Marcelo de Oliveira Castro",
+      "Marcio de Souza Ribeiro", "Marco Antonio da Silva", "Marcos Roberto de Souza",
+      "Maria Aparecida dos Santos", "Maria Clara de Oliveira", "Maria Eduarda de Souza",
+      "Mariana de Oliveira Silva", "Mario de Souza Ribeiro", "Mateus de Oliveira Castro",
+      "Matheus de Souza Silva", "Mauricio de Oliveira Silva", "Mayara Maria dos Santos",
+      "Michel de Souza Ribeiro", "Miguel de Oliveira Castro", "Milena Maria dos Santos",
+      "Moises de Oliveira Silva", "Monica Maria dos Santos", "Murilo de Souza Ribeiro",
+      "Nadjane Maria dos Santos", "Natalia de Oliveira Silva", "Nathan de Souza Ribeiro",
+      "Nelson de Oliveira Castro", "Nivaldo de Souza Silva", "Odair de Oliveira Silva",
+      "Orlando de Souza Ribeiro", "Osvaldo de Oliveira Castro", "Pablo de Souza Silva",
+      "Paloma Maria dos Santos", "Patricia de Oliveira Silva", "Paula Maria dos Santos",
+      "Paulo Henrique de Oliveira", "Paulo Pereira", "Paulo Picanço", "Pedro Henrique de Souza",
+      "Rafael de Oliveira Castro", "Raimundo de Souza Ribeiro", "Raquel Maria dos Santos",
+      "Raul de Oliveira Silva", "Regina Maria dos Santos", "Renan de Souza Ribeiro",
+      "Renata de Oliveira Castro", "Renato de Souza Silva", "Ricardo de Oliveira Silva",
+      "Rita de Cássia dos Santos", "Roberto de Souza Ribeiro", "Rodrigo de Oliveira Castro",
+      "Rogerio de Souza Silva", "Ronaldo de Oliveira Silva", "Rosa Maria dos Santos",
+      "Rosana de Oliveira Silva", "Rosangela Maria dos Santos", "Rubens de Souza Ribeiro",
+      "Samara Maria dos Santos", "Samuel de Oliveira Castro", "Sandra Maria dos Santos",
+      "Sandro de Souza Ribeiro", "Sergio de Oliveira Castro", "Sheila Maria dos Santos",
+      "Silvana de Oliveira Silva", "Silvia Maria dos Santos", "Simone de Souza Ribeiro",
+      "Stefany Maria dos Santos", "Tania Maria dos Santos", "Tarcisio de Oliveira Castro",
+      "Tatiany Maria dos Santos", "Thais de Souza Ribeiro", "Thiago de Oliveira Castro",
+      "Tiago de Souza Silva", "Valdir de Oliveira Silva", "Valeria Maria dos Santos",
+      "Vanderlei de Souza Ribeiro", "Vanessa de Oliveira Castro", "Vicente de Souza Silva",
+      "Victor de Oliveira Silva", "Vinicius de Souza Ribeiro", "Vitor Bremgartner da Frota",
+      "Viviane Maria dos Santos", "Wagner de Oliveira Castro", "Waldir de Souza Ribeiro",
+      "Wellington de Oliveira Silva", "Wesley de Souza Castro", "William de Oliveira Silva",
+      "Wilson de Souza Ribeiro", "Yuri de Oliveira Castro"
+    ];
 
-    function setPreloaderVisible(visible) {
-      const loader = document.getElementById('preloader');
-      if (visible) {
-        loader.classList.remove('hidden-loader');
-      } else {
-        setTimeout(() => { loader.classList.add('hidden-loader'); }, 600);
-      }
-    }
-
-    async function carregarDados() {
-      setPreloaderVisible(true);
-      try {
-        const response = await fetch(`${jsonUrl}?cache=${new Date().getTime()}`);
-        if (!response.ok) throw new Error("Erro ao carregar o arquivo de dados");
-        
-        const data = await response.json();
-        bancoDeTurmas = data.turmas || [];
-
-        // Preenche Autocomplete de Turmas
-        const datalistTurmas = document.getElementById('listaTurmas');
-        datalistTurmas.innerHTML = '';
-        bancoDeTurmas.forEach(item => {
-          if (item.codigo) {
-            const option = document.createElement('option');
-            option.value = item.codigo;
-            option.text = `${item.codigo} - ${item.nome || ''}`;
-            datalistTurmas.appendChild(option);
-          }
-        });
-
-        // Preenche Autocomplete de Docentes
-        const datalistDocentes = document.getElementById('listaDocentes');
-        datalistDocentes.innerHTML = '';
-        (data.docentes || []).forEach(docente => {
+    function carregarDadosEmbutidos() {
+      // Preenche Autocomplete de Turmas
+      const datalistTurmas = document.getElementById('listaTurmas');
+      datalistTurmas.innerHTML = '';
+      bancoDeTurmas.forEach(item => {
+        if (item.codigo) {
           const option = document.createElement('option');
-          option.value = typeof docente === 'object' ? (docente.nome || docente.Title) : docente;
-          datalistDocentes.appendChild(option);
-        });
+          option.value = item.codigo;
+          option.text = `${item.codigo} - ${item.nome || ''}`;
+          datalistTurmas.appendChild(option);
+        }
+      });
 
-        // Libera a interface
-        document.getElementById('cursoInput').disabled = false;
-        document.getElementById('docenteInput').disabled = false;
-        document.getElementById('btnIniciar').disabled = false;
+      // Preenche Autocomplete de Docentes
+      const datalistDocentes = document.getElementById('listaDocentes');
+      datalistDocentes.innerHTML = '';
+      bancoDeDocentes.forEach(docente => {
+        const option = document.createElement('option');
+        option.value = typeof docente === 'object' ? (docente.nome || docente.Title) : docente;
+        datalistDocentes.appendChild(option);
+      });
 
-      } catch (err) {
-        console.error("Erro no carregamento dos dados:", err);
-        alert("A base de dados ainda está sendo sincronizada. Tente novamente em alguns segundos.");
-      } finally {
-        setPreloaderVisible(false);
-      }
+      // Oculta o preloader suavemente
+      setTimeout(() => {
+        const loader = document.getElementById('preloader');
+        if (loader) loader.classList.add('hidden-loader');
+      }, 300);
     }
 
     function exibirNomeDoCurso() {
@@ -217,7 +437,7 @@
       const nomeCurso = turmaObjeto.nome || '';
       const unidadeOperativa = turmaObjeto.unidade || '';
 
-      const formsBaseUrl = linksFormsPorUnidade[unidadeOperativa] || linksFormsPorUnidade["CEP Fernando A. Pequeno Franco"];
+      const formsBaseUrl = linksFormsPorUnidade[unidadeOperativa] || defaultFormUrl;
 
       const urlFinal = `${formsBaseUrl}` + 
         `&r2680abcaed03412ba6e06cddc7d7b2ab=${encodeURIComponent(codigoTurma)}` +
@@ -227,7 +447,7 @@
       window.location.href = urlFinal;
     }
 
-    window.onload = carregarDados;
+    window.onload = carregarDadosEmbutidos;
   </script>
 </body>
 </html>
