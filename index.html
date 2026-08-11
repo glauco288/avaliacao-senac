@@ -111,15 +111,14 @@
   </main>
 
   <script>
-    // Dicionário de Links do Microsoft Forms por Unidade Operativa
     const linksFormsPorUnidade = {
       "CEP Fernando A. Pequeno Franco": "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=VYz8K3TflEuoWng2wpkRuEHJoITf4ytAq_d0ngTT7xNUNVdSQTVZU1c3WUlXVk9aS0NSVzJPMElaRC4u",
       "CEP Manaus": "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=URL_MANAUS",
       "CEP Parintins": "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=URL_PARINTINS"
     };
 
-    // Link do arquivo no OneDrive/SharePoint adaptado para leitura direta
-    const jsonUrl = "https://senacam-my.sharepoint.com/:u:/g/personal/glauco_soprano_am_senac_br/IQAVBwaciPCrS7Kd5a6_38vSAbpawgtsUrHbD3XBKsMkxWo?e=5NEAQf&download=1";
+    // Lê o arquivo gerado localmente pelo GitHub Action
+    const jsonUrl = "./dados.json";
 
     let bancoDeTurmas = [];
 
@@ -135,8 +134,8 @@
     async function carregarDados() {
       setPreloaderVisible(true);
       try {
-        const response = await fetch(jsonUrl);
-        if (!response.ok) throw new Error("Erro ao baixar dados do OneDrive");
+        const response = await fetch(`${jsonUrl}?cache=${new Date().getTime()}`);
+        if (!response.ok) throw new Error("Erro ao carregar o arquivo de dados");
         
         const data = await response.json();
         bancoDeTurmas = data.turmas || [];
@@ -162,14 +161,14 @@
           datalistDocentes.appendChild(option);
         });
 
-        // Libera a tela
+        // Libera a interface
         document.getElementById('cursoInput').disabled = false;
         document.getElementById('docenteInput').disabled = false;
         document.getElementById('btnIniciar').disabled = false;
 
       } catch (err) {
         console.error("Erro no carregamento dos dados:", err);
-        alert("Erro ao conectar com a base de dados. Verifique a permissão do arquivo no OneDrive.");
+        alert("A base de dados ainda está sendo sincronizada. Tente novamente em alguns segundos.");
       } finally {
         setPreloaderVisible(false);
       }
