@@ -1,0 +1,25 @@
+{
+  "turmas": [
+    {
+      "codigo": "2026.2.107",
+      "nome": "Business Intelligence com Power BI",
+      "unidade": "CEP Fernando A. Pequeno Franco"
+    },
+    {
+      "codigo": "2026.2.182",
+      "nome": "Técnico em Enfermagem",
+      "unidade": "CEP Manaus"
+    },
+    {
+      "codigo": "2026.2.200",
+      "nome": "Design Gráfico Digital",
+      "unidade": "CEP Parintins"
+    }
+  ],
+  "docentes": [
+    "Abigail Costa",
+    "Adailton Freitas",
+    "Glauco Soprano Machado",
+    "Anastácia Soares"
+  ]
+}
