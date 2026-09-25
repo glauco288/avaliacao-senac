@@ -69,15 +69,15 @@
   <script>
     const formsBaseUrl = "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=VYz8K3TflEuoWng2wpkRuMvJDVHkwjVIplsiTqqUZX9UMU4ySTdRNUc1UFpVSTM1T1I5Q0YyMjVJMi4u";
     
-    // ATENÇÃO: COLOQUE AQUI A URL "RAW" DO SEU ARQUIVO dados.json NO GITHUB
-    const jsonUrl = "COLE_AQUI_O_SEU_LINK_RAW"; 
+    // O seu link Raw correto colocado na variável que faz a requisição:
+    const jsonUrl = "https://raw.githubusercontent.com/glauco288/avaliacao-senac/refs/heads/main/dados.json"; 
 
     let bancoDeTurmas = [];
     let bancoDeDocentes = [];
 
     async function carregarDadosExternos() {
       try {
-        if(jsonUrl === "https://raw.githubusercontent.com/glauco288/avaliacao-senac/refs/heads/main/dados.json"){
+        if(jsonUrl === "COLE_AQUI_O_SEU_LINK_RAW"){
             alert("Atenção: A URL do GitHub não foi configurada no código HTML. Altere a variável jsonUrl.");
             return;
         }
@@ -112,7 +112,7 @@
 
       } catch (err) {
         console.error("Erro ao puxar dados do GitHub:", err);
-        document.getElementById('loader-title').textContent = "Falha na conexão.";
+        document.getElementById('loader-title').textContent = "Falha na conexão com o GitHub.";
         document.getElementById('loader-title').classList.add("text-red-600");
       }
     }
